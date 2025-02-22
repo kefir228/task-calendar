@@ -3,11 +3,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface CalendarState {
     year: number
     month: number
+    currentDay: number
 }
 
 const initialState: CalendarState = {
     year: new Date().getFullYear(),
     month: new Date().getMonth(),
+    currentDay: new Date().getDate(),
 }
 
 const calendarSlice = createSlice({
@@ -27,9 +29,15 @@ const calendarSlice = createSlice({
             }
             state.month = newMonth
             state.year = newYear
+        },
+        setYear: (state, action: PayloadAction<number>) => {
+            state.year = action.payload
+        },
+        setMonth: (state, action: PayloadAction<number>) => {
+            state.month = action.payload
         }
     }
 })
 
-export const {changeMonth} = calendarSlice.actions
+export const { changeMonth, setYear, setMonth } = calendarSlice.actions
 export default calendarSlice.reducer

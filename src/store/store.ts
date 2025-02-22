@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import calendarReducer from '@/store/calendarSlice'
+import modalReducer from '@/store/modalSlice'
 
 export const store = configureStore({
-    reducer:{
+    reducer: {
         calendar: calendarReducer,
+        modal: modalReducer,
     }
 })
 
