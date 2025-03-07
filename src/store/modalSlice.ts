@@ -15,7 +15,7 @@ interface modalState {
 
 const getSavedTask = ():FormData[] => {
     if(typeof window !== 'undefined') {
-        return JSON.parse(localStorage.getItem('task')||'[]')
+        return JSON.parse(localStorage.getItem('tasks')||'[]')
     }
     return []
 }
@@ -37,9 +37,12 @@ const modalSlice = createSlice({
         addTask: (state, action: PayloadAction<FormData>) => {
             state.tasks.push(action.payload)
             localStorage.setItem('tasks', JSON.stringify(state.tasks))
+        },
+        setTasks: (state) => {
+            state.tasks = getSavedTask()
         }
     }
 })
 
-export const { openModal, addTask } = modalSlice.actions
+export const { openModal, addTask, setTasks } = modalSlice.actions
 export default modalSlice.reducer
