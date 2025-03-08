@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { nanoid } from "@reduxjs/toolkit";
-import { id } from "date-fns/locale";
 
 interface FormData {
     id:string
