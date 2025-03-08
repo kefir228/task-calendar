@@ -5,7 +5,7 @@ import { FaRegCalendar } from "react-icons/fa6";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { RootState } from "@/store/store";
 import { changeMonth } from "@/store/calendarSlice";
-import { openModal } from "@/store/modalSlice";
+import { openModal, setCurrentTask } from "@/store/modalSlice";
 import Modal from "./Modal";
 import PickerDate from "./DatePicker";
 
@@ -20,6 +20,7 @@ export default function Header() {
     }
 
     const openOtherModal = () => {
+        dispatch(setCurrentTask(null))
         dispatch(openModal({ isOpen: true, type: 'modal' }))
     }
 

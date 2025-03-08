@@ -1,10 +1,13 @@
 'use client'
 
 import { RxCross2 } from "react-icons/rx";
+import { FaTrashAlt } from "react-icons/fa";
 import { useForm } from 'react-hook-form'
-import { openModal, addTask } from "@/store/modalSlice";
+import { openModal, addTask, updateTask, deleteTask } from "@/store/modalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useEffect } from "react";
+import { nanoid } from "@reduxjs/toolkit";
 
 
 interface FormData {
@@ -16,24 +19,48 @@ interface FormData {
 
 export default function Modal() {
     const dispatch = useDispatch()
-    const { isOpen } = useSelector((state: RootState) => state.modal)
+    const { isOpen, currentTask } = useSelector((state: RootState) => state.modal)
     const {
         register,
         handleSubmit,
         formState: { errors },
-        reset
+        reset,
+        setValue
     } = useForm<FormData>()
 
+    useEffect(() => {
+        if (currentTask) {
+            reset({
+                title: currentTask.title,
+                description: currentTask.description,
+                date: currentTask.date,
+                time: currentTask.time
+            })
+        } else {
+            reset()
+        }
+    }, [currentTask, setValue, reset])
+
     const onSumbit = (data: FormData) => {
-        dispatch(addTask(data))
-        reset()
+        if (currentTask) {
+            dispatch(updateTask({...currentTask, ...data}))
+        } else {
+            dispatch(addTask({...data, id: nanoid()}))
+        }
         closeModal()
-        console.log('Form Data', data);
     }
 
     const closeModal = () => {
         dispatch(openModal({ isOpen: false, type: 'modal' }))
+        reset()
     }
+
+    const handleDelete = () => {
+        if (currentTask) {
+            dispatch(deleteTask(currentTask));
+            closeModal();
+        }
+    };
 
     return (
         isOpen && (
@@ -42,7 +69,9 @@ export default function Modal() {
                     className="max-w-md w-full mx-auto p-6 bg-white shadow-md rounded-lg"
                 >
                     <div className="mb-4 flex items-center justify-between">
-                        <label className="block font-semibold">Додати нову подію</label>
+                        <label className="block font-semibold">
+                            {currentTask ? 'Редагувати подію' : 'Додати нову подію'}
+                        </label>
                         <button onClick={closeModal}>
                             <RxCross2 />
                         </button>
@@ -54,6 +83,7 @@ export default function Modal() {
                             className="w-full p-2 border-b border-gray-300 mt-1"
                             placeholder="Введіть назву"
                         />
+                        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
                     </div>
 
                     <div>
@@ -66,6 +96,7 @@ export default function Modal() {
                             placeholder="Введіть опис..."
                             rows={4}
                         />
+                        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                     </div>
 
                     <div className="flex items-center justify-between flex-wrap">
@@ -89,10 +120,18 @@ export default function Modal() {
                         />
                         {errors.time && <p className="text-red-500 text-sm">{errors.time.message}</p>}
                     </div>
+                    
+                    <div className="flex justify-end mt-4 gap-1">
+                        {currentTask && (
+                            <button type="button" className="bg-red-500 text-white p-2 rounded" onClick={handleDelete}>
+                                <FaTrashAlt />
+                            </button>
+                        )}
+                        <button type="submit" className="bg-gray-500 text-white p-2 rounded">
+                            {currentTask ? "Оновити" : "Зберегти"}
+                        </button>
+                    </div>
 
-                    <button type="submit" className="bg-blue-500 p-1 rounded mt-2">
-                        SAVE
-                    </button>
                 </form>
             </div >
         )

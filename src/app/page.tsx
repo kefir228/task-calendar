@@ -1,23 +1,25 @@
 'use client'
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { getDaysInMonth } from "@/utils/DaysInMonth";
 import { useClient } from "@/utils/useClient";
 import { useLoadTasks } from "@/utils/useLoadTasks";
+import { openModal, setCurrentTask } from "@/store/modalSlice";
 
 export default function Calendar() {
   const { year, month, currentDay } = useSelector((state: RootState) => state.calendar)
   const tasks = useSelector((state: RootState) => state.modal.tasks)
+  const dispatch = useDispatch()
 
   useLoadTasks()
 
   const days = getDaysInMonth(year, month)
 
   if (!useClient()) return null
-  
+
   return (
-    <div className="h-screen flex flex-col max-w-full mx-auto p-4 border rounded-lg shadow-md">
+    <div className="h-screen flex flex-col max-w-full mx-auto p-4 border rounded-lg shadow-md" >
       <div className="grid grid-cols-7 gap-1 text-center flex-grow font-semibold">
         {days.map((day, index) => {
           const date = day ? day : ''
@@ -31,7 +33,7 @@ export default function Calendar() {
           return (
             <div
               key={index}
-              className={`relative p-4 flex flex-col flex-grow justify-between rounded-md  
+              className={`relative p-4 flex flex-col flex-grow rounded-md  
                           ${day ? "bg-white" : "bg-gray-400"} 
                           ${day === currentDay ? "!bg-green-300 text-white font-bold" : ""}`}>
               <div className="absolute top-1 left-2 text-xs opacity-70">{weekDay}</div>
@@ -40,8 +42,12 @@ export default function Calendar() {
               {dayTasks.map((task, i) => (
                 <div
                   key={i}
-                  className="bg-gray-500 p-1 rounded text-xs mt-1 truncate"
+                  className="bg-gray-500 p-1 rounded text-xs mt-1 truncate cursor-pointer"
                   title={task.title}
+                  onClick={() => {
+                    dispatch(openModal({ isOpen: true, type: 'modal' }))
+                    dispatch(setCurrentTask(task))
+                  }}
                 >
                   {task.title}
                 </div>
