@@ -24,12 +24,17 @@ export default function Calendar() {
         {days.map((day, index) => {
           const date = day ? day : ''
           const weekDay = day ? ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"][new Date(year, month, day).getDay()] : "";
-          const dayTasks = tasks.filter(task => {
-            const taskDate = new Date(task.date).getDate()
-            const taskMonth = new Date(task.date).getMonth()
-            return taskDate === day && taskMonth === month
-          })
-
+          const dayTasks = tasks
+            .filter(task => {
+              const taskDate = new Date(task.date).getDate()
+              const taskMonth = new Date(task.date).getMonth()
+              return taskDate === day && taskMonth === month
+            })
+            .sort((a, b) => {
+              const timeA = a.time ? parseInt(a.time.replace(':', ''), 10) : 0
+              const timeB = b.time ? parseInt(b.time.replace(':', ''), 10) : 0
+              return timeA - timeB
+            })
           return (
             <div
               key={index}

@@ -7,8 +7,6 @@ import { openModal, addTask, updateTask, deleteTask } from "@/store/modalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useEffect } from "react";
-import { nanoid } from "@reduxjs/toolkit";
-
 
 interface FormData {
     title: string
@@ -43,9 +41,9 @@ export default function Modal() {
 
     const onSumbit = (data: FormData) => {
         if (currentTask) {
-            dispatch(updateTask({...currentTask, ...data}))
+            dispatch(updateTask({ ...currentTask, ...data, updatedAt: new Date().toISOString() }))
         } else {
-            dispatch(addTask({...data, id: nanoid()}))
+            dispatch(addTask(data))
         }
         closeModal()
     }
@@ -57,7 +55,7 @@ export default function Modal() {
 
     const handleDelete = () => {
         if (currentTask) {
-            dispatch(deleteTask(currentTask));
+            dispatch(deleteTask(currentTask.id));
             closeModal();
         }
     };
@@ -76,6 +74,15 @@ export default function Modal() {
                             <RxCross2 />
                         </button>
                     </div>
+
+                    {currentTask && (
+                        <div className="mt-4 text-sm text-gray-600">
+                            <p>Створено: {new Date(currentTask.createdAt).toLocaleString()}</p>
+                            {currentTask.updatedAt !== currentTask.createdAt && (
+                                <p>Оновлено: {new Date(currentTask.updatedAt).toLocaleString()}</p>
+                            )}
+                        </div>
+                    )}
 
                     <div>
                         <input
@@ -120,7 +127,7 @@ export default function Modal() {
                         />
                         {errors.time && <p className="text-red-500 text-sm">{errors.time.message}</p>}
                     </div>
-                    
+
                     <div className="flex justify-end mt-4 gap-1">
                         {currentTask && (
                             <button type="button" className="bg-red-500 text-white p-2 rounded" onClick={handleDelete}>

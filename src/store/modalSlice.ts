@@ -2,11 +2,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { nanoid } from "@reduxjs/toolkit";
 
 interface FormData {
-    id:string
+    id: string
     title: string
     description: string
     date: string
     time: string
+    createdAt: string
+    updatedAt: string
 }
 
 interface modalState {
@@ -39,8 +41,13 @@ const modalSlice = createSlice({
             state.type = action.payload.type
             state.currentTask = action.payload.task || null
         },
-        addTask: (state, action: PayloadAction<FormData>) => {
-            const newTask = {...action.payload, id:nanoid()}
+        addTask: (state, action: PayloadAction<Omit<FormData, 'id' | 'createdAt' | 'updatedAt'>>) => {
+            const newTask: FormData = {
+                ...action.payload,
+                id: nanoid(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }
             state.tasks.push(newTask)
             localStorage.setItem('tasks', JSON.stringify(state.tasks))
         },
@@ -52,17 +59,12 @@ const modalSlice = createSlice({
         },
         updateTask: (state, action: PayloadAction<FormData>) => {
             state.tasks = state.tasks.map((task) =>
-                task.id === action.payload.id ? action.payload : task
+                task.id === action.payload.id ? { ...action.payload, updatedAt: new Date().toISOString() } : task
             )
             localStorage.setItem('tasks', JSON.stringify(state.tasks))
         },
-        deleteTask: (state, action: PayloadAction<FormData>) => {
-            state.tasks = state.tasks.filter((task) =>
-                !(task.title === action.payload.title &&
-                    task.description === action.payload.description &&
-                    task.date === action.payload.date &&
-                    task.time === action.payload.time)
-            )
+        deleteTask: (state, action: PayloadAction<string>) => {
+            state.tasks = state.tasks.filter((task) => task.id !== action.payload)
             localStorage.setItem('tasks', JSON.stringify(state.tasks))
         }
     }
