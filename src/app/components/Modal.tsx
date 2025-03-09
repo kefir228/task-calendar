@@ -23,7 +23,6 @@ export default function Modal() {
         handleSubmit,
         formState: { errors },
         reset,
-        setValue
     } = useForm<FormData>()
 
     useEffect(() => {
@@ -37,7 +36,7 @@ export default function Modal() {
         } else {
             reset()
         }
-    }, [currentTask, setValue, reset])
+    }, [currentTask])
 
     const onSumbit = (data: FormData) => {
         if (currentTask) {

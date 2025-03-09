@@ -59,7 +59,8 @@ const modalSlice = createSlice({
         },
         updateTask: (state, action: PayloadAction<FormData>) => {
             state.tasks = state.tasks.map((task) =>
-                task.id === action.payload.id ? { ...action.payload, updatedAt: new Date().toISOString() } : task
+                task.id === action.payload.id && JSON.stringify(task) !== JSON.stringify(action.payload)
+                    ? { ...action.payload, updatedAt: new Date().toISOString() } : task
             )
             localStorage.setItem('tasks', JSON.stringify(state.tasks))
         },
